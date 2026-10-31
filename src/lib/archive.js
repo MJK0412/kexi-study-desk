@@ -30,7 +30,7 @@ function reportFailure(error) {
   if (Date.now() - lastFailureNoticeAt < 30000) return;
   lastFailureNoticeAt = Date.now();
   notify(
-    '自动保存到 D:\\课隙 失败。请确认 D 盘可用，课程仍保留在浏览器中。',
+    '自动保存到本地归档失败。请确认保存目录可用，课程仍保留在浏览器中。',
     'error',
     6000,
   );

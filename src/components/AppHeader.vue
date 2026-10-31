@@ -129,7 +129,7 @@ const canExport = computed(() => Boolean(activeCourse.value && state.slices.leng
           type="button"
           class="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted transition hover:bg-surface hover:text-ink"
           aria-label="打开保存文件夹"
-          title="打开 D:\课隙 保存文件夹"
+          :title="`打开 ${state.archiveRoot} 保存文件夹`"
           @click="emit('open-archive')"
         >
           <FolderOpen :size="16" :stroke-width="1.8" />
@@ -138,7 +138,7 @@ const canExport = computed(() => Boolean(activeCourse.value && state.slices.leng
         <button
           type="button"
           class="focus-ring hidden items-center gap-1.5 rounded-full border border-moss/20 bg-moss-soft/60 px-2.5 py-1.5 text-[10.5px] font-medium text-moss lg:inline-flex"
-          title="切片和笔记会自动保存到 D:\课隙，浏览器中保留一份工作副本"
+          :title="`切片和笔记会自动保存到 ${state.archiveRoot}，浏览器中保留一份工作副本`"
           @click="emit('help')"
         >
           <ShieldCheck :size="12" :stroke-width="2" />

@@ -19,5 +19,8 @@ __pycache__/
 *.log
 *.lnk
 /*.png
+/*.exe
+/*.zip
+installer/*.exe
 *.local
 .DS_Store

@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
           <Loader2 :size="21" class="animate-spin" />
         </div>
         <p class="mt-4 text-[12px] font-medium text-ink-soft">正在打开本地学习台</p>
-        <p class="mt-1 text-[10.5px] text-faint">读取本地课程，并同步 D:\课隙 存档…</p>
+        <p class="mt-1 text-[10.5px] text-faint">读取本地课程，并同步 {{ state.archiveRoot }} 存档…</p>
       </div>
     </div>
 
@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
         本地优先 · 视频不离开设备
         <span class="text-line-strong">/</span>
         <button type="button" class="transition hover:text-ink" @click="revealArchiveFolder">
-          自动保存至 D:\课隙
+          自动保存至 {{ state.archiveRoot }}
         </button>
         <span class="text-line-strong">/</span>
         <span>快捷键：Space 播放暂停 · ← → 快退快进 5 秒 · N 下一段</span>

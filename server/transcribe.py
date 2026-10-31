@@ -105,6 +105,10 @@ def main():
         raise FileNotFoundError(f"找不到视频文件：{input_path}")
 
     os.makedirs(args.download_root, exist_ok=True)
+    # First-run model download: avoid the Xet cache path and use a reachable mirror.
+    os.environ.setdefault("HF_HOME", str(Path(args.download_root) / ".hf"))
+    os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+    os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
     duration = audio_duration(input_path)
 
     emit(

@@ -1,9 +1,17 @@
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 
-export const ARCHIVE_ROOT = process.env.KEXI_ARCHIVE_ROOT || 'D:\\课隙';
+function defaultArchiveRoot() {
+  if (process.env.KEXI_ARCHIVE_ROOT) return process.env.KEXI_ARCHIVE_ROOT;
+  if (process.platform === 'win32' && existsSync('D:\\')) return 'D:\\课隙';
+  return path.join(os.homedir(), 'Documents', '课隙');
+}
+
+export const ARCHIVE_ROOT = defaultArchiveRoot();
 
 const DATA_FILE = '课程数据.json';
 const OVERVIEW_FILE = '课程总览.md';

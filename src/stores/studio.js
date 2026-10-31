@@ -10,7 +10,7 @@ import {
   updateSliceFields,
 } from '../lib/db.js';
 import { isVideoFile, readVideoDuration } from '../lib/files.js';
-import { saveAllCoursesArchive, saveCourseArchive } from '../lib/archive.js';
+import { getArchiveStatus, saveAllCoursesArchive, saveCourseArchive } from '../lib/archive.js';
 import { makeId } from '../lib/id.js';
 import { buildSlices, findSliceAtTime, getSliceCues } from '../lib/slices.js';
 import { parseSubtitles } from '../lib/subtitles.js';
@@ -84,8 +84,18 @@ export const state = reactive({
   saveState: 'idle',
   importBusy: false,
   lastSavedAt: 0,
+  archiveRoot: 'D:\\课隙',
   toasts: [],
 });
+
+export async function refreshArchiveRoot() {
+  try {
+    const status = await getArchiveStatus();
+    if (status?.root) state.archiveRoot = status.root;
+  } catch {
+    /* The visible default stays in place until the server answers. */
+  }
+}
 
 export const activeCourse = computed(
   () => state.courses.find((course) => course.id === state.activeCourseId) ?? null,
@@ -222,6 +232,7 @@ export async function initStudio() {
       await activateCourse(activeId, { initial: true });
     }
     if (state.courses.length) void saveAllCoursesArchive();
+    void refreshArchiveRoot();
   } catch (error) {
     console.error(error);
     state.fatalError = '无法打开本地数据库。请确认浏览器允许本地存储，或尝试 Chrome / Edge 的最新版本。';

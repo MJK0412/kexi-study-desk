@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-vue-next';
 import { openArchiveFolder } from '../lib/archive.js';
+import { state } from '../stores/studio.js';
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -53,7 +54,7 @@ async function revealArchive() {
               <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-clay">Study workflow</p>
               <h2 class="mt-1 font-display text-[25px] font-semibold leading-tight text-ink">从字幕到笔记</h2>
               <p class="mt-1.5 text-[13px] leading-6 text-muted">
-                打开本地视频或 B 站缓存，自动生成字幕和切片；标签、笔记会自动保存到 D:\课隙。
+                打开本地视频或 B 站缓存，自动生成字幕和切片；标签、笔记会自动保存到 {{ state.archiveRoot }}。
               </p>
             </div>
             <button
@@ -106,7 +107,7 @@ async function revealArchive() {
                 切片和笔记保存在哪里
               </div>
               <p class="mt-2 text-[12px] leading-5 text-muted">
-                每门课在 <code class="font-mono text-[10.5px]">D:\课隙</code> 下有一个以课程名命名的文件夹。
+                每门课在 <code class="font-mono text-[10.5px]">{{ state.archiveRoot }}</code> 下有一个以课程名命名的文件夹。
                 文件夹里每个切片一个 <span class="font-medium text-ink-soft">.md</span>（含字幕、标签、笔记），
                 另有 <span class="font-medium text-ink-soft">课程总览.md</span> 和完整备份
                 <span class="font-medium text-ink-soft">课程数据.json</span>。改动后会自动更新。
@@ -120,7 +121,7 @@ async function revealArchive() {
                 >
                   <Loader2 v-if="openingArchive" :size="13" class="animate-spin" />
                   <FolderOpen v-else :size="13" />
-                  打开 D:\课隙
+                  打开 {{ state.archiveRoot }}
                 </button>
                 <span class="text-[10.5px] text-faint">浏览器中会保留一份工作副本</span>
               </div>
@@ -141,7 +142,7 @@ async function revealArchive() {
                 <h3 class="mt-2.5 text-[13px] font-semibold text-ink">数据只在本机</h3>
                 <p class="mt-1 text-[12px] leading-5 text-muted">
                   视频只写入本地临时文件，识别完成即删除；切片、标签和笔记自动保存到
-                  <span class="font-medium text-ink-soft">D:\课隙</span>，浏览器保留工作副本。
+                  <span class="font-medium text-ink-soft">{{ state.archiveRoot }}</span>，浏览器保留工作副本。
                 </p>
               </div>
             </section>
@@ -158,7 +159,7 @@ async function revealArchive() {
           </div>
 
           <div class="flex items-center justify-between gap-4 border-t border-line/75 bg-paper/45 px-6 py-3.5">
-            <p class="text-[11px] text-faint">课程自动保存到 D:\课隙 · 只处理你主动选择的本地文件与缓存</p>
+            <p class="text-[11px] text-faint">课程自动保存到 {{ state.archiveRoot }} · 只处理你主动选择的本地文件与缓存</p>
             <button
               class="focus-ring rounded-lg bg-pine px-4 py-2 text-[12.5px] font-semibold text-surface-strong transition hover:bg-pine-2"
               @click="emit('close')"

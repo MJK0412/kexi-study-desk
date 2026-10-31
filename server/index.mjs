@@ -47,6 +47,7 @@ function pythonPath() {
   const candidates =
     process.platform === 'win32'
       ? [
+          path.join(ROOT, 'runtime', 'python', 'python.exe'),
           path.join(__dirname, '.venv', 'Scripts', 'python.exe'),
           path.join(ROOT, '.venv', 'Scripts', 'python.exe'),
         ]
