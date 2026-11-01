@@ -8,16 +8,16 @@
 
 ## 给同学：免安装便携版
 
-如果对方电脑没有 Node.js / Python，也不想运行安装程序，使用 `课隙-便携版.zip`：
+如果对方电脑没有 Node.js / Python，也不想运行安装程序，使用 `kexi-portable-v0.1.1.zip`：
 
-**直接下载**：[GitHub Releases · 课隙 v0.1.0 便携版](https://github.com/MJK0412/kexi-study-desk/releases/latest)
+**直接下载**：[GitHub Releases · 课隙 v0.1.1 便携版](https://github.com/MJK0412/kexi-study-desk/releases/tag/v0.1.1)
 
-1. 解压整个「课隙」文件夹到任意位置（不要在压缩包里直接双击）。
-2. 双击 `课隙.vbs`，等待 3–5 秒，浏览器会自动打开。
-3. 想放桌面，双击 `创建桌面快捷方式.vbs`。
+1. 解压整个 `kexi-portable` 文件夹到任意位置（不要在压缩包里直接双击）。
+2. 双击 `start-kexi.vbs`，等待 5–15 秒，浏览器会自动打开。
+3. 想放桌面，双击 `create-shortcut.vbs`。
 4. 首次自动转写会下载约 480MB 模型；之后可离线使用。
 
-便携版自带 Node、Python 和语音依赖，不需要管理员权限，也不会触发 Smart App Control 拦截。不要把 `课隙.vbs` 单独移出文件夹。
+v0.1.1 已修复启动器在非 UTF-8 Windows 上的 `0x800A0408 无效字符` 错误，并把顶层文件名改成英文，避免中文 ZIP 乱码。便携版自带 Node、Python 和语音依赖，不需要管理员权限，也不会触发 Smart App Control 拦截。不要把 `start-kexi.vbs` 单独移出文件夹。
 
 ## 直接使用（推荐）
 
