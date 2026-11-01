@@ -66,7 +66,7 @@ function probeAsrRuntime() {
   }
   const result = spawnSync(
     python,
-    ['-c', 'import faster_whisper, av; print("ok")'],
+    ['-c', 'import faster_whisper, av, opencc; print("ok")'],
     { encoding: 'utf8', timeout: 15000, windowsHide: true },
   );
   if (result.status !== 0) {
@@ -330,6 +330,48 @@ function readJsonBody(req, limit = 1024 * 1024) {
   });
 }
 
+function convertTextsToSimplified(texts) {
+  const python = pythonPath();
+  if (!python) {
+    const error = new Error('本地繁简转换环境未安装');
+    error.code = 'T2S_UNAVAILABLE';
+    throw error;
+  }
+  const result = spawnSync(python, [path.join(__dirname, 'convert_text.py')], {
+    input: JSON.stringify({ texts }),
+    encoding: 'utf8',
+    timeout: 30000,
+    windowsHide: true,
+    env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
+  });
+  if (result.status !== 0) {
+    const error = new Error('繁简转换失败');
+    error.code = 'T2S_FAILED';
+    error.detail = (result.stderr || '').slice(-800);
+    throw error;
+  }
+  const parsed = JSON.parse(result.stdout || '{}');
+  if (!Array.isArray(parsed.texts) || parsed.texts.length !== texts.length) {
+    const error = new Error('繁简转换结果不完整');
+    error.code = 'T2S_BAD_RESPONSE';
+    throw error;
+  }
+  return parsed.texts.map((text) => String(text ?? ''));
+}
+
+async function handleTextApi(req, res, url) {
+  if (req.method === 'POST' && url.pathname === '/api/text/t2s') {
+    const body = await readJsonBody(req, 16 * 1024 * 1024);
+    if (!Array.isArray(body.texts) || body.texts.length > 50000) {
+      throw new BilibiliError('字幕内容格式不正确', 'BAD_TEXTS', 400);
+    }
+    const texts = body.texts.map((text) => String(text ?? ''));
+    json(res, 200, { texts: convertTextsToSimplified(texts) });
+    return true;
+  }
+  return false;
+}
+
 async function receiveRawFile(req, destination) {
   const length = Number(req.headers['content-length']) || 0;
   if (length > MAX_UPLOAD_BYTES) {
@@ -532,6 +574,10 @@ async function handleApi(req, res, url) {
       engine: 'faster-whisper',
     });
     return true;
+  }
+
+  if (url.pathname.startsWith('/api/text')) {
+    if (await handleTextApi(req, res, url)) return true;
   }
 
   if (url.pathname.startsWith('/api/archive')) {

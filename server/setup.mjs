@@ -51,7 +51,16 @@ const env = {
 console.log('正在安装本地语音识别组件（仅首次需要）…');
 const install = spawnSync(
   PYTHON,
-  ['-m', 'pip', 'install', '--upgrade', 'faster-whisper', '--prefer-binary', '--no-input'],
+  [
+    '-m',
+    'pip',
+    'install',
+    '--upgrade',
+    'faster-whisper',
+    'opencc-python-reimplemented',
+    '--prefer-binary',
+    '--no-input',
+  ],
   { stdio: 'inherit', env, windowsHide: true },
 );
 if (install.status !== 0) {

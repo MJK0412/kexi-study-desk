@@ -14,6 +14,7 @@ import { getArchiveStatus, saveAllCoursesArchive, saveCourseArchive } from '../l
 import { makeId } from '../lib/id.js';
 import { buildSlices, findSliceAtTime, getSliceCues } from '../lib/slices.js';
 import { parseSubtitles } from '../lib/subtitles.js';
+import { convertTextsToSimplified, textsDiffer } from '../lib/text.js';
 import { notify } from '../composables/useToast.js';
 
 const ACTIVE_COURSE_KEY = 'kexi:activeCourse';
@@ -198,6 +199,43 @@ function touchCourse(course = activeCourse.value) {
   return course;
 }
 
+async function migrateLegacyScript(course, subtitles, slices) {
+  if (course.scriptVersion === 'simplified-v1') return { subtitles, slices };
+  if (!subtitles.length && !slices.length) {
+    course.scriptVersion = 'simplified-v1';
+    await putCourse(course);
+    return { subtitles, slices };
+  }
+
+  const sourceTexts = [
+    ...subtitles.map((item) => String(item.text || '')),
+    ...slices.flatMap((slice) => [String(slice.title || ''), String(slice.preview || '')]),
+  ];
+  const converted = await convertTextsToSimplified(sourceTexts);
+  if (!converted) return { subtitles, slices };
+
+  let changed = textsDiffer(sourceTexts, converted);
+  const nextSubtitles = subtitles.map((item, index) => ({
+    ...item,
+    text: converted[index] ?? item.text,
+  }));
+  const offset = subtitles.length;
+  const nextSlices = slices.map((slice, index) => ({
+    ...slice,
+    title: converted[offset + index * 2] ?? slice.title,
+    preview: converted[offset + index * 2 + 1] ?? slice.preview,
+  }));
+
+  course.scriptVersion = 'simplified-v1';
+  await putCourse(course);
+  if (changed) {
+    await replaceSubtitles(course.id, nextSubtitles);
+    if (nextSlices.length) await replaceSlices(course.id, nextSlices);
+    void saveCourseArchive(course.id);
+  }
+  return { subtitles: nextSubtitles, slices: nextSlices };
+}
+
 async function migrateLegacySlices(course, subtitles, slices) {
   if (course.sliceMode === 'semantic' || !subtitles.length || !slices.length) return slices;
 
@@ -271,8 +309,13 @@ export async function activateCourse(courseId, { initial = false } = {}) {
       getSubtitlesByCourse(courseId),
       getSlicesByCourse(courseId),
     ]);
-    const upgradedSlices = await migrateLegacySlices(course, subtitles, slices);
-    state.subtitles = subtitles;
+    const scriptUpgraded = await migrateLegacyScript(course, subtitles, slices);
+    const upgradedSlices = await migrateLegacySlices(
+      course,
+      scriptUpgraded.subtitles,
+      scriptUpgraded.slices,
+    );
+    state.subtitles = scriptUpgraded.subtitles;
     state.slices = upgradedSlices;
     if (course.sliceCount !== upgradedSlices.length) course.sliceCount = upgradedSlices.length;
 
@@ -514,6 +557,13 @@ export async function applySubtitleItems(
     };
   }
 
+  const simplified = await convertTextsToSimplified(normalized.map((item) => item.text));
+  if (simplified) {
+    normalized.forEach((item, index) => {
+      item.text = simplified[index] ?? item.text;
+    });
+  }
+
   try {
     const previousSlices = replace ? state.slices.map((slice) => ({ ...slice })) : [];
     const totalDuration = Math.max(
@@ -539,6 +589,7 @@ export async function applySubtitleItems(
     course.duration = totalDuration;
     course.subtitleFileName = sourceName;
     course.subtitleSource = sourceName === '自动转写' ? 'auto' : 'file';
+    if (simplified) course.scriptVersion = 'simplified-v1';
     course.sliceMode = 'semantic';
     delete course.sliceInterval;
     course.sliceCount = nextSlices.length;

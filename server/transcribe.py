@@ -7,6 +7,13 @@ from pathlib import Path
 
 import numpy as np
 
+try:
+    from opencc import OpenCC
+
+    _t2s = OpenCC("t2s")
+except Exception:
+    _t2s = None
+
 
 SAMPLE_RATE = 16000
 CHUNK_SECONDS = 600
@@ -18,6 +25,8 @@ INITIAL_PROMPT = (
 
 def normalize_text(text):
     text = text.strip()
+    if _t2s is not None:
+        text = _t2s.convert(text)
     if any("\u4e00" <= char <= "\u9fff" for char in text):
         text = (
             text.replace(",", "，")

@@ -8,9 +8,9 @@
 
 ## 给同学：免安装便携版
 
-如果对方电脑没有 Node.js / Python，也不想运行安装程序，使用 `kexi-portable-v0.1.1.zip`：
+如果对方电脑没有 Node.js / Python，也不想运行安装程序，使用 `kexi-portable-v0.1.2.zip`：
 
-**直接下载**：[GitHub Releases · 课隙 v0.1.1 便携版](https://github.com/MJK0412/kexi-study-desk/releases/tag/v0.1.1)
+**直接下载**：[GitHub Releases · 课隙 v0.1.2 便携版](https://github.com/MJK0412/kexi-study-desk/releases/tag/v0.1.2)
 
 1. 解压整个 `kexi-portable` 文件夹到任意位置（不要在压缩包里直接双击）。
 2. 双击 `start-kexi.vbs`，等待 5–15 秒，浏览器会自动打开。
